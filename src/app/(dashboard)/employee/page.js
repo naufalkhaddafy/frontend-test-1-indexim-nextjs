@@ -1,4 +1,19 @@
 "use client";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
 import {
   Table,
   TableBody,
@@ -9,10 +24,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import axios from "axios";
-import { useEffect, useState } from "react";
 
 export default function page() {
   const [employees, setEmployees] = useState("");
@@ -28,7 +39,44 @@ export default function page() {
         <div className="flex justify-between mb-5">
           <h3 className="text-3xl">Data Karyawan</h3>
 
-          <Button className="bg-green-600">Add</Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="bg-green-600 text-white">
+                Add
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Tambah Data Karyawan</DialogTitle>
+                <DialogDescription></DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name" className="text-right">
+                    Name
+                  </Label>
+                  <Input
+                    id="name"
+                    value="Pedro Duarte"
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="username" className="text-right">
+                    Username
+                  </Label>
+                  <Input
+                    id="username"
+                    value="@peduarte"
+                    className="col-span-3"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="submit">Save changes</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
         <div className="flex items-center justify-start mb- border-t-4 py-4">
           <Input placeholder="search..." className="w-60 " />
