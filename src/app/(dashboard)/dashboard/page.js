@@ -17,7 +17,7 @@ import {
 import { useState } from "react";
 
 export default function page() {
-  const [profile, setProfile] = useState();
+  let profile = [];
   const token = nookies.get();
   axios
     .request({
@@ -28,37 +28,14 @@ export default function page() {
       url: `${process.env.NEXT_PUBLIC_URL}/api/profile`,
     })
     .then((response) => {
-      // setProfile(response.data.data);
-      console.log(response.data.data);
+      profile = response.data.data;
+      console.log(profile.name);
     });
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const token = nookies.get();
-  //     console.error(token);
-  //     try {
-  //       const response = await axios.get(
-  //         `${process.env.NEXT_PUBLIC_URL}/api/profile`,
-  //         {},
-  //         {
-  //           headers: {
-  //             Authorization: "Bearer " + token.token,
-  //           },
-  //         }
-  //       );
-  //       setData(response);
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
-  //   fetchData();
-  // }, []);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-start">
       <Link href="/login">Home</Link>
-      Hello IAM Dashboard
-      {profile}
+      Hello I am Dashboard {}
       <AlertDialog>
         <AlertDialogTrigger>Logout</AlertDialogTrigger>
         <AlertDialogContent>

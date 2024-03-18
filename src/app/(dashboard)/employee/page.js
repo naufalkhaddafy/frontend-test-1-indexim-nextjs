@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import nookies from "nookies";
+import { ToastAction } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -19,66 +22,159 @@ import {
   TableBody,
   TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Toaster } from "@/components/ui/toaster";
 
 export default function page() {
   const [employees, setEmployees] = useState("");
+  const [open, setOpen] = useState(false);
+  const { toast } = useToast();
+
+  const [addForm, setAddForm] = useState({
+    username: "",
+    name: "",
+    email: "",
+    password: "",
+  });
+
+  const token = nookies.get();
+
+  const onChange = (e) => {
+    setAddForm({ ...addForm, [e.target.name]: e.target.value });
+  };
+
+  // console.log(["form", addForm]);
+  // console.log(["token", token]);
+
   useEffect(() => {
     axios.get(`${process.env.NEXT_PUBLIC_URL}/api/user`).then((response) => {
       setEmployees(response.data.data);
     });
   }, []);
 
+  async function addEmployee(e) {
+    e.preventDefault();
+    axios
+      .post(`${process.env.NEXT_PUBLIC_URL}/api/user`, addForm, {
+        headers: {
+          Authorization: "Bearer " + token.token,
+        },
+      })
+      .then((res) => {
+        setEmployees([...employees, res.data.data]);
+        setOpen(false);
+        toast({
+          title: "Succes Create Employee",
+          description: `Success Data ${res.data.data.name}`,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  async function deleteEmployee(id) {
+    axios
+      .delete(`${process.env.NEXT_PUBLIC_URL}/api/user/${id}/delete`, {
+        headers: {
+          Authorization: "Bearer " + token.token,
+        },
+      })
+      .then((res) => {
+        setEmployees(employees.filter((employee) => employee.id !== id));
+        setOpen(false);
+        toast({
+          title: "Succes Delete ",
+          description: `Success Delete Data Employee`,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-start mx-20 mt-10">
       <div className="w-full p-6 rounded-xl shadow-lg border">
         <div className="flex justify-between mb-5">
           <h3 className="text-3xl">Data Karyawan</h3>
-
-          <Dialog>
+          <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" className="bg-green-600 text-white">
                 Add
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Tambah Data Karyawan</DialogTitle>
-                <DialogDescription></DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Name
-                  </Label>
-                  <Input
-                    id="name"
-                    value="Pedro Duarte"
-                    className="col-span-3"
-                  />
+            <DialogContent className="sm:max-w-[425px] min-w-[800px]">
+              <form onSubmit={addEmployee}>
+                <DialogHeader>
+                  <DialogTitle>Tambah Data Karyawan</DialogTitle>
+                  <DialogDescription></DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid items-center gap-4">
+                    <Label htmlFor="name" className="">
+                      Name
+                    </Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      className="col-span-3"
+                      placeholder="Input your name"
+                      onChange={onChange}
+                    />
+                  </div>
+                  <div className="grid items-center gap-4">
+                    <Label htmlFor="username" className="">
+                      Username
+                    </Label>
+                    <Input
+                      id="username"
+                      name="username"
+                      className="col-span-3"
+                      placeholder="Input your username"
+                      onChange={onChange}
+                    />
+                  </div>
+                  <div className="grid items-center gap-4">
+                    <Label htmlFor="email" className="">
+                      Email
+                    </Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="Input your email"
+                      className="col-span-3"
+                      onChange={onChange}
+                    />
+                  </div>
+                  <div className="grid items-center gap-4">
+                    <Label htmlFor="password" className="">
+                      Password
+                    </Label>
+                    <Input
+                      id="password"
+                      name="password"
+                      type="password"
+                      placeholder="Input your password"
+                      className="col-span-3"
+                      onChange={onChange}
+                    />
+                  </div>
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="username" className="text-right">
-                    Username
-                  </Label>
-                  <Input
-                    id="username"
-                    value="@peduarte"
-                    className="col-span-3"
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button type="submit">Save changes</Button>
-              </DialogFooter>
+                <DialogFooter>
+                  <Button type="submit" className="bg-blue-500">
+                    Create
+                  </Button>
+                </DialogFooter>
+              </form>
             </DialogContent>
           </Dialog>
         </div>
-        <div className="flex items-center justify-start mb- border-t-4 py-4">
+        <div className="flex items-center justify-start mb- border-t-2 py-4">
           <Input placeholder="search..." className="w-60 " />
           {/* <Button className="bg-green-600">Print</Button> */}
         </div>
@@ -106,7 +202,12 @@ export default function page() {
                   <TableCell className="text-right">
                     <div className="flex justify-end items-center gap-3">
                       <Button className="bg-orange-600">edit</Button>
-                      <Button variant="destructive">delete</Button>
+                      <Button
+                        variant="destructive"
+                        onClick={(e) => deleteEmployee(employee.id)}
+                      >
+                        delete
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -114,6 +215,7 @@ export default function page() {
           </TableBody>
         </Table>
       </div>
+      <Toaster />
     </div>
   );
 }
