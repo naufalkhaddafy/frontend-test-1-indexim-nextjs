@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import nookies from "nookies";
-import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
 import {
   Dialog,
@@ -186,7 +185,7 @@ export default function page() {
               <TableHead>Name</TableHead>
               <TableHead>Username</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>id</TableHead>
+              <TableHead>NRP</TableHead>
               <TableHead className="text-right">Action</TableHead>
             </TableRow>
           </TableHeader>
@@ -198,7 +197,7 @@ export default function page() {
                   <TableCell>{employee.name}</TableCell>
                   <TableCell>{employee.username}</TableCell>
                   <TableCell>{employee.email}</TableCell>
-                  <TableCell>{employee.id}</TableCell>
+                  <TableCell>{employee.nrp}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end items-center gap-3">
                       <Button className="bg-orange-600">edit</Button>
