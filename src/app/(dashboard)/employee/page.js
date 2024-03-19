@@ -96,7 +96,7 @@ export default function page() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-start mx-20 mt-10">
+    <div className="flex min-h-screen flex-col items-center justify-start">
       <div className="w-full p-6 rounded-xl shadow-lg border">
         <div className="flex justify-between mb-5">
           <h3 className="text-3xl">Data Karyawan</h3>
