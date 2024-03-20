@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import ModalAddEmployee from "@/components/dashboard/employee/ModalAddEmployee";
 import ModalDeleteEmployee from "@/components/dashboard/employee/ModalDeleteEmployee";
+import ModalUpdateEmployee from "@/components/dashboard/employee/ModalUpdateEmployee";
 
 import {
   Table,
@@ -22,9 +23,8 @@ import {
 export default function page() {
   const { toast } = useToast();
   const token = nookies.get();
-  const [openAdd, setOpenAdd] = useState(false);
   const [employees, setEmployees] = useState("");
-
+  const [openModal, setOpenModal] = useState(false);
   // console.log(addForm);
   useEffect(() => {
     axios
@@ -49,7 +49,7 @@ export default function page() {
     shift_id: "",
     password: "",
   });
-
+  console.log(addForm);
   const onChange = (e) => {
     setAddForm({ ...addForm, [e.target.name]: e.target.value });
   };
@@ -64,9 +64,9 @@ export default function page() {
       })
       .then((res) => {
         setEmployees([...employees, res.data.data]);
-        setOpenAdd(false);
+        setOpenModal(false);
         toast({
-          title: "Succes Create Employee",
+          title: "Successfully Create Employee",
           description: `Success Data ${res.data.data.name}`,
         });
       })
@@ -75,6 +75,45 @@ export default function page() {
       });
   }
 
+  async function updateEmployee(id) {
+    // e.preventDefault();
+    // await axios
+    //   .patch(`${process.env.NEXT_PUBLIC_URL}/api/user/${id}`, addForm, {
+    //     headers: {
+    //       Authorization: "Bearer " + token.token,
+    //     },
+    //   })
+    //   .then((res) => {
+    //     setEmployees([...employees, res.data.data]);
+    //     setOpenModal(false);
+    //     toast({
+    //       title: "Successfully Create Employee",
+    //       description: `Success Data ${res.data.data.name}`,
+    //     });
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
+  }
+
+  async function deleteEmployee(id) {
+    axios
+      .delete(`${process.env.NEXT_PUBLIC_URL}/api/user/${id}/delete`, {
+        headers: {
+          Authorization: "Bearer " + token.token,
+        },
+      })
+      .then((res) => {
+        setEmployees(employees.filter((employee) => employee.id !== id));
+        toast({
+          title: "Succes Delete ",
+          description: `Success Delete Data Employee ${res.data.data.name}`,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
   return (
     <div className="flex min-h-screen flex-col items-center justify-start">
       <div className="w-full p-6 rounded-xl shadow-lg border">
@@ -83,8 +122,8 @@ export default function page() {
           <ModalAddEmployee
             onChange={onChange}
             addEmployee={addEmployee}
-            setOpenAdd={setOpenAdd}
-            openAdd={openAdd}
+            setOpenModal={setOpenModal}
+            openModal={openModal}
           />
         </div>
         <div className="flex items-center justify-start mb- border-t-2 py-4">
@@ -92,7 +131,7 @@ export default function page() {
           {/* <Button className="bg-green-600">Print</Button> */}
         </div>
         <Table className="border">
-          <TableCaption>A list of your recent invoices.</TableCaption>
+          <TableCaption>A list of employees.</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead className="w-[100px]">No.</TableHead>
@@ -120,8 +159,17 @@ export default function page() {
                   <TableCell>{employee.shift}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end items-center gap-3">
-                      <Button className="bg-orange-600">edit</Button>
-                      <ModalDeleteEmployee {...employee} />
+                      <ModalUpdateEmployee
+                        onChange={onChange}
+                        updateEmployee={updateEmployee}
+                        employee={employee}
+                        setOpenModal={setOpenModal}
+                        openModal={openModal}
+                      />
+                      <ModalDeleteEmployee
+                        employee={employee}
+                        deleteEmployee={deleteEmployee}
+                      />
                     </div>
                   </TableCell>
                 </TableRow>

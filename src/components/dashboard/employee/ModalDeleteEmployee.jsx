@@ -12,42 +12,19 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
-export default function ModalDeleteEmployee({ employee }) {
+export default function ModalDeleteEmployee({ employee, deleteEmployee }) {
   const [openDelete, setOpenDelete] = useState(false);
-  const router = useRouter();
-
-  async function deleteEmployee(id) {
-    axios
-      .delete(`${process.env.NEXT_PUBLIC_URL}/api/user/${id}/delete`, {
-        headers: {
-          Authorization: "Bearer " + token.token,
-        },
-      })
-      .then((res) => {
-        router.refresh();
-        setOpenDelete(false);
-        toast({
-          title: "Succes Delete ",
-          description: `Success Delete Data Employee`,
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-
   return (
     <AlertDialog open={openDelete} onOpenChange={setOpenDelete}>
       <AlertDialogTrigger>
-        <button>Hapus</button>
+        <Button className="bg-red-600">Hapus</Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Karyawan</AlertDialogTitle>
           <AlertDialogDescription>
-            Apakah anda ingin menghapus data karyawan? {employee}
+            Apakah anda ingin menghapus data karyawan? {employee.name}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

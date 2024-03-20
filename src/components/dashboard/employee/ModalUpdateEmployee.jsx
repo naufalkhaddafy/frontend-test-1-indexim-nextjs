@@ -20,23 +20,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export default function ModalAddEmployee({
+export default function ModalUpdateEmployee({
   onChange,
-  addEmployee,
-  openModal,
-  setOpenModal,
+  updateEmployee,
+  openUpdate,
+  setOpenUpdate,
+  employee,
 }) {
+  //   console.log(employee);
   return (
-    <Dialog open={openModal} onOpenChange={setOpenModal}>
+    <Dialog open={openUpdate} onOpenChange={setOpenUpdate}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="bg-green-600 text-white">
-          Add
-        </Button>
+        <Button className="bg-orange-600 text-white">Edit</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] min-w-[800px] max-h-screen overflow-auto">
-        <form onSubmit={addEmployee}>
+        <form>
           <DialogHeader>
-            <DialogTitle>Tambah Data Karyawan</DialogTitle>
+            <DialogTitle>Edit Data Karyawan</DialogTitle>
             <DialogDescription></DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -50,6 +50,7 @@ export default function ModalAddEmployee({
                 className="col-span-3"
                 placeholder="Input your name"
                 onChange={onChange}
+                // value={employee.name}
               />
             </div>
             <div className="grid items-center gap-4">
@@ -62,6 +63,7 @@ export default function ModalAddEmployee({
                 className="col-span-3"
                 placeholder="Input your username"
                 onChange={onChange}
+                value={employee.username}
               />
             </div>
             <div className="grid items-center gap-4">
@@ -75,6 +77,7 @@ export default function ModalAddEmployee({
                 placeholder="Input your email"
                 className="col-span-3"
                 onChange={onChange}
+                value={employee.email}
               />
             </div>
             <div className="grid items-center gap-4">
@@ -88,6 +91,7 @@ export default function ModalAddEmployee({
                 placeholder="Input your nrp"
                 className="col-span-3"
                 onChange={onChange}
+                value={employee.nrp}
               />
             </div>
             <div className="grid items-center gap-4">
@@ -101,6 +105,7 @@ export default function ModalAddEmployee({
                 placeholder="Input your department"
                 className="col-span-3"
                 onChange={onChange}
+                value={employee.department}
               />
             </div>
             <div className="grid items-center gap-4">
@@ -114,6 +119,7 @@ export default function ModalAddEmployee({
                 placeholder="Input your position"
                 className="col-span-3"
                 onChange={onChange}
+                value={employee.position}
               />
             </div>
             <div className="grid items-center gap-4">
