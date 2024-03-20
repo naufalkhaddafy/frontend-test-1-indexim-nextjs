@@ -1,20 +1,13 @@
 "use client";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import nookies from "nookies";
+import nookies, { destroyCookie } from "nookies";
+import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Toaster } from "@/components/ui/toaster";
+import ModalAddEmployee from "@/components/dashboard/employee/ModalAddEmployee";
+import ModalDeleteEmployee from "@/components/dashboard/employee/ModalDeleteEmployee";
 
 import {
   Table,
@@ -25,34 +18,41 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Toaster } from "@/components/ui/toaster";
 
 export default function page() {
-  const [employees, setEmployees] = useState("");
-  const [open, setOpen] = useState(false);
   const { toast } = useToast();
+  const token = nookies.get();
+  const [openAdd, setOpenAdd] = useState(false);
+  const [employees, setEmployees] = useState("");
+
+  // console.log(addForm);
+  useEffect(() => {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_URL}/api/user`, {
+        headers: {
+          Authorization: "Bearer " + token.token,
+        },
+      })
+      .then((response) => {
+        setEmployees(response.data.data);
+      });
+  }, []);
 
   const [addForm, setAddForm] = useState({
     username: "",
     name: "",
     email: "",
+    nrp: "",
+    image: "",
+    department: "",
+    position: "",
+    shift_id: "",
     password: "",
   });
-
-  const token = nookies.get();
 
   const onChange = (e) => {
     setAddForm({ ...addForm, [e.target.name]: e.target.value });
   };
-
-  // console.log(["form", addForm]);
-  // console.log(["token", token]);
-
-  useEffect(() => {
-    axios.get(`${process.env.NEXT_PUBLIC_URL}/api/user`).then((response) => {
-      setEmployees(response.data.data);
-    });
-  }, []);
 
   async function addEmployee(e) {
     e.preventDefault();
@@ -64,30 +64,10 @@ export default function page() {
       })
       .then((res) => {
         setEmployees([...employees, res.data.data]);
-        setOpen(false);
+        setOpenAdd(false);
         toast({
           title: "Succes Create Employee",
           description: `Success Data ${res.data.data.name}`,
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-
-  async function deleteEmployee(id) {
-    axios
-      .delete(`${process.env.NEXT_PUBLIC_URL}/api/user/${id}/delete`, {
-        headers: {
-          Authorization: "Bearer " + token.token,
-        },
-      })
-      .then((res) => {
-        setEmployees(employees.filter((employee) => employee.id !== id));
-        setOpen(false);
-        toast({
-          title: "Succes Delete ",
-          description: `Success Delete Data Employee`,
         });
       })
       .catch((err) => {
@@ -100,78 +80,12 @@ export default function page() {
       <div className="w-full p-6 rounded-xl shadow-lg border">
         <div className="flex justify-between mb-5">
           <h3 className="text-3xl">Data Karyawan</h3>
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="bg-green-600 text-white">
-                Add
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] min-w-[800px]">
-              <form onSubmit={addEmployee}>
-                <DialogHeader>
-                  <DialogTitle>Tambah Data Karyawan</DialogTitle>
-                  <DialogDescription></DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid items-center gap-4">
-                    <Label htmlFor="name" className="">
-                      Name
-                    </Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      className="col-span-3"
-                      placeholder="Input your name"
-                      onChange={onChange}
-                    />
-                  </div>
-                  <div className="grid items-center gap-4">
-                    <Label htmlFor="username" className="">
-                      Username
-                    </Label>
-                    <Input
-                      id="username"
-                      name="username"
-                      className="col-span-3"
-                      placeholder="Input your username"
-                      onChange={onChange}
-                    />
-                  </div>
-                  <div className="grid items-center gap-4">
-                    <Label htmlFor="email" className="">
-                      Email
-                    </Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="Input your email"
-                      className="col-span-3"
-                      onChange={onChange}
-                    />
-                  </div>
-                  <div className="grid items-center gap-4">
-                    <Label htmlFor="password" className="">
-                      Password
-                    </Label>
-                    <Input
-                      id="password"
-                      name="password"
-                      type="password"
-                      placeholder="Input your password"
-                      className="col-span-3"
-                      onChange={onChange}
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button type="submit" className="bg-blue-500">
-                    Create
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
+          <ModalAddEmployee
+            onChange={onChange}
+            addEmployee={addEmployee}
+            setOpenAdd={setOpenAdd}
+            openAdd={openAdd}
+          />
         </div>
         <div className="flex items-center justify-start mb- border-t-2 py-4">
           <Input placeholder="search..." className="w-60 " />
@@ -186,6 +100,9 @@ export default function page() {
               <TableHead>Username</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>NRP</TableHead>
+              <TableHead>Department</TableHead>
+              <TableHead>Postion</TableHead>
+              <TableHead>Shift</TableHead>
               <TableHead className="text-right">Action</TableHead>
             </TableRow>
           </TableHeader>
@@ -198,15 +115,13 @@ export default function page() {
                   <TableCell>{employee.username}</TableCell>
                   <TableCell>{employee.email}</TableCell>
                   <TableCell>{employee.nrp}</TableCell>
+                  <TableCell>{employee.department}</TableCell>
+                  <TableCell>{employee.position}</TableCell>
+                  <TableCell>{employee.shift}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end items-center gap-3">
                       <Button className="bg-orange-600">edit</Button>
-                      <Button
-                        variant="destructive"
-                        onClick={(e) => deleteEmployee(employee.id)}
-                      >
-                        delete
-                      </Button>
+                      <ModalDeleteEmployee {...employee} />
                     </div>
                   </TableCell>
                 </TableRow>
