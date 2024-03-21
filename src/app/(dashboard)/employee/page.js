@@ -8,7 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import ModalAddEmployee from "@/components/dashboard/employee/ModalAddEmployee";
 import ModalDeleteEmployee from "@/components/dashboard/employee/ModalDeleteEmployee";
-import ModalUpdateEmployee from "@/components/dashboard/employee/ModalUpdateEmployee";
+import Link from "next/link";
 
 import {
   Table,
@@ -25,7 +25,7 @@ export default function page() {
   const token = nookies.get();
   const [employees, setEmployees] = useState("");
   const [openModal, setOpenModal] = useState(false);
-  // console.log(addForm);
+
   useEffect(() => {
     axios
       .get(`${process.env.NEXT_PUBLIC_URL}/api/user`, {
@@ -159,13 +159,11 @@ export default function page() {
                   <TableCell>{employee.shift}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end items-center gap-3">
-                      <ModalUpdateEmployee
-                        onChange={onChange}
-                        updateEmployee={updateEmployee}
-                        employee={employee}
-                        setOpenModal={setOpenModal}
-                        openModal={openModal}
-                      />
+                      <Link href={"/employee/profile/" + employee.id}>
+                        <div className="hover:bg-gray-200 hover:rounded-lg p-2 flex items-center">
+                          View Detail
+                        </div>
+                      </Link>
                       <ModalDeleteEmployee
                         employee={employee}
                         deleteEmployee={deleteEmployee}
